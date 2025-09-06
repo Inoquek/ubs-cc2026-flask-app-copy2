@@ -62,7 +62,6 @@ class Sol:
         last = self.closest_to_idx(series, N - 1)
         mid = self.closest_to_idx(series, N // 2)
         arit_avg = (first + last) / 2
-        print(first * last)
         geom_avg = self.int_sqrt(last * first)
         # range = last - first
         exp_flag = False
@@ -94,6 +93,7 @@ def blankety():
     data = request.get_json(silent=True) or {}
     TEST_CASE += 1
     logger.info(f"PROCESSING #{TEST_CASE}")
-
-
-    return Sol(data['series']).solve()
+    logger.info(data['series'])
+    answer = Sol(data['series']).solve()
+    logger.info(f"answer shape: {len(answer)}x{len(answer[0])}")
+    return answer
