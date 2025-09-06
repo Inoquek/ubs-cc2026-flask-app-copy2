@@ -126,6 +126,7 @@ TEST_CASE = 0
 
 @app.route("/princess-diaries", methods = ["POST"])
 def princess_diaries():
+    global TEST_CASE
     data = request.get_json(silent=True) or {}
     TEST_CASE += 1
     logger.warning(f"FULL DATA #{TEST_CASE}")
