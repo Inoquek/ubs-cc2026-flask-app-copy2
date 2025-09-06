@@ -337,6 +337,7 @@ bbox_size_to_digit = {
 
 class Sol():
     def __init__(self, base64_string):
+        self.b64 = base64_string
         self.pixels = extract_pixels_from_base64(base64_string)
         self.connected_areas = extract_connected_areas(self.pixels)
     def parse_digits(self, rgb):
@@ -350,6 +351,9 @@ class Sol():
                     digit[1] = 9
                 digits.append(tuple(digit))
         digits.sort()
+        if len(digits) == 0:
+            logger.error(self.b64)
+
         assert len(digits) > 0
         edge_weight = 0
         for _, d in digits:
