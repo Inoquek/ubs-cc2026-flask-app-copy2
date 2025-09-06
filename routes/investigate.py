@@ -57,51 +57,14 @@ def calc(network: dict) -> dict:
     return out
 
 
-@app.post("/investigate")
+@app.route("/investigate", methods = ["POST"])
 def investigate():
-    """
-    POST /investigate
-    Body:
-    {
-      "networks": [
-        {
-          "networkId": "N1",
-          "network": [{"spy1":"A","spy2":"B"}, {"spy1":"B","spy2":"C"}]
-        },
-        ...
-      ]
-    }
-
-    Response:
-    {
-      "networks": [
-        {
-          "networkId": "N1",
-          "network": [{"spy1":"A","spy2":"B"}, ...]  # edges that are still connected if removed
-        },
-        ...
-      ]
-    }
-    """
     data = request.get_json(silent=True) or {}
     networks = data.get("networks")
 
     logger.info(networks)
     result = {"networks": [calc(n) for n in networks]}
     logger.info("investigate result: %s", result)
-    return jsonify(result)
+    return json.dumps(result)
 
-
-# @app.route('/investigate', methods=['POST'])
-# def evaluate():
-#     data = request.get_json()
-#     logging.info("data sent for evaluation {}".format(data))
-#     networks = data.get("networks")
-
-#     result = {"networks": []}
-#     for network in networks:
-#         result["networks"].append(calc(network))
-    
-#     logging.info("My result :{}".format(result))
-#     return json.dumps(result)
 
