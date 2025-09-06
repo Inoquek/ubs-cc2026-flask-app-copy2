@@ -64,6 +64,7 @@ def investigate():
 
     logger.info("Received networks: %d", len(networks))
 
+    return jsonify(networks)
     result = {"networks": [calc(n) for n in networks]}
     logger.info("investigate result: %s", result)
     return jsonify(result)
