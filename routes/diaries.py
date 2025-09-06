@@ -19,7 +19,6 @@ class Sol:
             self.vertices.append(v)
             
         self.vertices = list(set(self.vertices))
-        # print(f"vertices: {self.vertices}")
         for i, edge in enumerate(self.edges):
             u, v = edge['connection']
             self.edges[i] = (self.vertices.index(u), self.vertices.index(v), edge['fee'])
@@ -42,7 +41,7 @@ class Sol:
         self.times = list(set(self.times))
         self.times.sort()
         # only storing ending times of tasks
-        self.dp = {(0, self.s0): (0, 0, None)} # (score, -fee, schedule)
+        self.dp = {(0, self.s0): (0, 0, None)} # (score, -fee, name)
         answer = (0, 0, None)
         self.par = {}
         for task in sorted(self.tasks, key = lambda task: task['end']):
@@ -64,7 +63,7 @@ class Sol:
             if (score, fee) > answer[:-1]:
                 answer = (score, fee, task['name'])
         
-        print(answer)
+        logger.info(answer)
         last_task = answer[2]
         schedule = []
         fee_brute_force = 0
@@ -93,7 +92,7 @@ class Sol:
             "min_fee": -answer[1],
             "schedule": schedule
         }
-        logger.info(self.n, len(self.times))
+        logger.info(f"N = {self.n}, T = {len(self.tasks)}")
         return answer
 
 
