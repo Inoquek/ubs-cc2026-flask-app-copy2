@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 TEST_CASE = 0
 @app.route("/blankety", methods = ["POST"])
-def princess_diaries():
+def blankety():
     global TEST_CASE
     data = request.get_json(silent=True) or {}
     TEST_CASE += 1
