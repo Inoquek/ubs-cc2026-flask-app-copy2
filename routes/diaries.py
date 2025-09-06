@@ -3,6 +3,7 @@ import json
 import logging
 from routes import app
 from flask import jsonify, request
+import numpy as np
 logger = logging.getLogger(__name__)
 
 class Sol:
@@ -27,7 +28,6 @@ class Sol:
 
     def solve(self):
         self.process_graph()
-        
         # TASK PROCESSING
         self.T = len(self.tasks)
         self.tasks.sort(key = lambda task: task['end'])
@@ -111,16 +111,20 @@ class Sol:
 
 
     def calc_dists(self):
-        self.d = [[self.INF] * self.n for _ in range(self.n)]
-        for i in range(self.n):
-            self.d[i][i] = 0
+        self.d = np.full((self.n, self.n), self.INF, dtype=np.float64)
+    
+        # Set diagonal to 0
+        np.fill_diagonal(self.d, 0)
+        
+        # Populate edge weights
         for u, v, fee in self.edges:
-            self.d[u][v] = fee
-            self.d[v][u] = fee
+            self.d[u, v] = fee
+            self.d[v, u] = fee
+        
+        # Floyd-Warshall algorithm with vectorized operations
         for k in range(self.n):
-            for i in range(self.n):
-                for j in range(self.n):
-                    self.d[i][j] = min(self.d[i][j], self.d[i][k] + self.d[k][j])
+            # Compute min(d[i,j], d[i,k] + d[k,j]) for all i,j
+            self.d = np.minimum(self.d, self.d[:, k:k+1] + self.d[k:k+1, :])
 
 TEST_CASE = 0
 
@@ -129,8 +133,7 @@ def princess_diaries():
     global TEST_CASE
     data = request.get_json(silent=True) or {}
     TEST_CASE += 1
-    logger.warning(f"FULL DATA #{TEST_CASE}")
-    logger.warning(data)
+    logger.info(f"PROCESSING #{TEST_CASE}")
 
     # extract top-level keys
     tasks = data.get("tasks", [])
@@ -138,11 +141,11 @@ def princess_diaries():
     starting_station = data.get("starting_station")
 
     # Example: log what we received
-    logger.warning("Received tasks:")
-    logger.warning(tasks)
-    logger.warning("Received subway connections:")
-    logger.warning(subway)
-    logger.warning("Starting station: %s", starting_station)
+    logger.info("Received tasks:")
+    logger.info(len(tasks))
+    logger.info("Received subway connections:")
+    logger.info(len(subway))
+    logger.info("Starting station: %s", starting_station)
     
     solution = Sol(tasks, subway, starting_station).solve()
     logger.info("Solution: %s", solution)
