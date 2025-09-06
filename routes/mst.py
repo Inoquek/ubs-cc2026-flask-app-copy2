@@ -10,8 +10,6 @@ from PIL import Image
 import numpy as np
 from scipy import ndimage
 from collections import defaultdict
-import pprint
-from contextlib import redirect_stdout
 logger = logging.getLogger(__name__)
 
 def extract_pixels_from_base64(base64_string):
