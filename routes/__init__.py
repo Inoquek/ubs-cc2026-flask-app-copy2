@@ -8,3 +8,4 @@ import routes.diaries
 import routes.blankety
 import routes.trading
 import routes.mst
+import routes.mouse
