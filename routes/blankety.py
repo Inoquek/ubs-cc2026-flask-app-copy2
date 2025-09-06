@@ -130,7 +130,7 @@ def blankety():
     data = request.get_json(silent=True) or {}
     TEST_CASE += 1
     logger.info(f"PROCESSING #{TEST_CASE}")
-    logger.info(data['series'])
+    # logger.info(data['series'])
     answer = Sol(data['series']).solve()
     logger.info(f"answer shape: {len(answer)}x{len(answer[0])}")
     return answer
