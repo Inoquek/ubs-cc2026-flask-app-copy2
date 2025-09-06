@@ -18,6 +18,6 @@ def trading():
     TEST_CASE += 1
     logger.info(f"PROCESSING #{TEST_CASE}")
 
-    logging.warning(data)
+    logger.warning(data)
 
     return jsonify([])
