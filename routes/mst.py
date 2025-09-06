@@ -90,7 +90,7 @@ def extract_connected_areas(pixels, min_size=5, ignore_color=[255, 255, 255]):
                 'color': color.tolist(),
                 'size': size,
                 'centroid': (round(centroid[0], 2), round(centroid[1], 2)),
-                'centroid_relative': (round(centroid[0] - min_y, 2), round(centroid[1] - min_x, 2)),
+                'centroid_relative': (round((centroid[0] - min_y) / (max_y - min_y), 2), round((centroid[1] - min_x) / (max_x - min_x), 2)),
                 'bbox': (min_y, min_x, max_y, max_x)
             })
     
@@ -222,8 +222,8 @@ def extract_edges_from_regions(regions):
     for color, connected_indices in color_to_regions.items():
         # Ensure exactly 2 regions per color
         if len(connected_indices) != 2:
-            logger.error(f"Warning: Color {color} connects {len(connected_indices)} regions (expected 2). Skipping.")
-            # assert False
+            logger.info(f"Warning: Color {color} connects {len(connected_indices)} regions (expected 2). Skipping.")
+            assert False
         
         idx1, idx2 = sorted(connected_indices)
         edges.append((idx1, idx2, list(color)))  # Convert tuple back to list for RGB
@@ -316,7 +316,6 @@ def testing(base64_string):
     edges = extract_edges_from_regions(regions)
     
 
-
 bbox_size_to_digit = {
     (np.int64(11), np.int64(7), np.int64(56)): 0,
     (np.int64(11), np.int64(8), np.int64(56)): 0,
@@ -334,6 +333,7 @@ bbox_size_to_digit = {
     (np.int64(11), np.int64(7), np.int64(36)): 7,
     (np.int64(11), np.int64(8), np.int64(40)): 7,
     (np.int64(11), np.int64(7), np.int64(56)): 8,
+    (np.int64(11), np.int64(8), np.int64(70)): 8,
 }
 
 class Sol():
@@ -348,13 +348,14 @@ class Sol():
                 continue
             if area['bbox_size'] in bbox_size_to_digit:
                 digit = [area['centroid'][1], bbox_size_to_digit[area['bbox_size']]]
-                if digit[1] == 6 and area['centroid_relative'] != (np.float64(5.38), np.float64(3.43)):
+                if digit[1] == 6 and min(area['centroid_relative']) > 0.5:
                     digit[1] = 9
+                    
                 digits.append(tuple(digit))
         digits.sort()
         if len(digits) == 0:
-            logger.error(self.b64)
-        # assert len(digits) > 0
+            logger.info(self.b64)
+        assert len(digits) > 0
         edge_weight = 0
         for _, d in digits:
             edge_weight = edge_weight * 10 + d
