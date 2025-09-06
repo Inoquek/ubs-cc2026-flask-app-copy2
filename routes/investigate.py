@@ -61,12 +61,10 @@ def calc(network: dict) -> dict:
 def investigate():
     data = request.get_json(silent=True) or {}
 
-    return jsonify(data)
     networks = data.get("networks", [])
 
     logger.info("Received networks: %d", len(networks))
 
-    return jsonify(networks)
     result = {"networks": [calc(n) for n in networks]}
     logger.info("investigate result: %s", result)
     return jsonify(result)
