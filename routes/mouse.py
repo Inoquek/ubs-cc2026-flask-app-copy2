@@ -703,6 +703,6 @@ def mouse():
     logger.info(f"---PROCESSING QUERY with uuid={data['game_uuid']}---")
     logger.info(data)
 
-    answer = sol.new_request()
+    answer = sol.new_request(data)
 
     return jsonify(answer)
