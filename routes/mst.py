@@ -319,13 +319,16 @@ def testing(base64_string):
 
 bbox_size_to_digit = {
     (np.int64(11), np.int64(7), np.int64(56)): 0,
+    (np.int64(11), np.int64(8), np.int64(56)): 0,
     (np.int64(11), np.int64(4), np.int64(30)): 1,
+    (np.int64(11), np.int64(7), np.int64(43)): 1,
     (np.int64(11), np.int64(7), np.int64(50)): 2,
     (np.int64(11), np.int64(7), np.int64(51)): 3,
     (np.int64(11), np.int64(8), np.int64(57)): 3,
     (np.int64(11), np.int64(7), np.int64(48)): 4,
     (np.int64(11), np.int64(9), np.int64(58)): 4,
     (np.int64(11), np.int64(7), np.int64(57)): 5,
+    (np.int64(11), np.int64(8), np.int64(61)): 5,
     (np.int64(11), np.int64(7), np.int64(58)): 6,
     (np.int64(11), np.int64(8), np.int64(62)): 6,
     (np.int64(11), np.int64(7), np.int64(36)): 7,
