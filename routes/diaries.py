@@ -126,6 +126,8 @@ class Sol:
 @app.route("/princess-diaries", methods = ["POST"])
 def princess_diaries():
     data = request.get_json(silent=True) or {}
+    logger.warning("FULL DATA")
+    logger.warning(data)
 
     # extract top-level keys
     tasks = data.get("tasks", [])
@@ -133,11 +135,11 @@ def princess_diaries():
     starting_station = data.get("starting_station")
 
     # Example: log what we received
-    logger.debug("Received tasks:")
-    logger.debug(tasks)
-    logger.info("Received subway connections:")
-    logger.info(subway)
-    logger.info("Starting station: %s", starting_station)
+    logger.warning("Received tasks:")
+    logger.warning(tasks)
+    logger.warning("Received subway connections:")
+    logger.warning(subway)
+    logger.warning("Starting station: %s", starting_station)
     
     solution = Sol(tasks, subway, starting_station).solve()
     logger.info("Solution: %s", solution)
