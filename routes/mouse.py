@@ -693,11 +693,11 @@ id_to_sol = {}
 def mouse():
     # global TEST_CASE
     data = request.get_json(silent=True) or {}
-    if data['uuid'] not in id_to_sol:
+    if data['game_uuid'] not in id_to_sol:
         sol = Sol()
-        id_to_sol[data['uuid']] = sol
+        id_to_sol[data['game_uuid']] = sol
     else:
-        sol = id_to_sol[data['uuid']]
+        sol = id_to_sol[data['game_uuid']]
     # TEST_CASE += 1
     logger.info(f"---PROCESSING QUERY with uuid={data['uuid']}---")
     logger.info(data)
