@@ -39,18 +39,19 @@ class Sol:
                 self.times.append(task['end'])
         self.times.sort()
         # only storing ending times of tasks
-        self.dp = {(t, v): (-40_000, 0, []) for t in range(len(self.times)) for v in range(self.n)} # (score, -fee, schedule)
-        self.dp[(0, self.s0)] = (0, 0, [])
+        self.dp = {(0, self.s0): (0, 0, [])} # (score, -fee, schedule)
         answer = (0, 0, [])
         for task in sorted(self.tasks, key = lambda task: task['end']):
             v_sit = task['station']
             t1, t2 = self.times.index(task['start']), self.times.index(task['end'])
-            for u in range(self.n):
-                for t0 in range(t1 + 1):
-                    # if we take t0:
-                    score_t0, fee_t0, schedule_t0 = self.dp[(t0, u)]
-                    for_t0 = (score_t0 + task['score'], fee_t0 - self.d[u][v_sit], schedule_t0 + [task['name']])
-                    self.dp[(t2, v_sit)] = max(self.dp[(t2, v_sit)], for_t0)
+            self.dp[(t2, v_sit)] = (-40_000, 0, [])
+            for (t0, u), (score, fee, schedule) in self.dp.items():
+                if t0 > t1:
+                    continue
+                # if we take t0:
+                score_t0, fee_t0, schedule_t0 = self.dp[(t0, u)]
+                for_t0 = (score_t0 + task['score'], fee_t0 - self.d[u][v_sit], schedule_t0 + [task['name']])
+                self.dp[(t2, v_sit)] = max(self.dp[(t2, v_sit)], for_t0)
 
             score, fee, schedule = self.dp[(t2, v_sit)]
             if_finish = (score, fee - self.d[v_sit][self.s0], schedule)
@@ -76,6 +77,7 @@ class Sol:
             for i in range(self.n):
                 for j in range(self.n):
                     self.d[i][j] = min(self.d[i][j], self.d[i][k] + self.d[k][j])
+        logger.info(f"N is {self.n}")
 
 # INPUT = {
 #   "tasks": [
