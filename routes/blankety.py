@@ -7,7 +7,60 @@ import math
 logger = logging.getLogger(__name__)
 
 N = 1000
-N = 1000
+def is_monotone(data):
+    # Filter out None values and keep only the non-missing entries
+    non_missing = [x for x in data if x is not None]
+    
+    if len(non_missing) < 2:
+        # If there are fewer than 2 non-missing values, we can't determine monotonicity
+        return False
+    
+    increasing_count = 0
+    decreasing_count = 0
+    
+    # Iterate through the non-missing entries to count increases and decreases
+    for i in range(1, len(non_missing)):
+        if non_missing[i] > non_missing[i - 1]:
+            increasing_count += 1
+        elif non_missing[i] < non_missing[i - 1]:
+            decreasing_count += 1
+    
+    total_comparisons = increasing_count + decreasing_count
+    
+    # Check if at least 90% are increasing or decreasing
+    if total_comparisons == 0:
+        return False  # No comparisons made (all values were equal)
+    
+    increasing_ratio = increasing_count / total_comparisons
+    decreasing_ratio = decreasing_count / total_comparisons
+    
+    return increasing_ratio >= 0.9 or decreasing_ratio >= 0.9
+
+def int_sqrt(x):
+    if abs(x) < 1e9:
+        return math.sqrt(x)
+    if x < 0:
+        raise ValueError("Input must be a non-negative integer.")
+    if x == 0 or x == 1:
+        return x
+    
+    left, right = 0, x
+    
+    while left <= right:
+        mid = (left + right) // 2
+        mid_squared = mid * mid
+        
+        if mid_squared == x:
+            return mid
+        elif mid_squared < x:
+            left = mid + 1
+            closest_sqrt = mid
+        else:
+            right = mid - 1
+
+    # After the loop, `closest_sqrt` is the integer closest to the square root
+    return closest_sqrt + 1 if (closest_sqrt + 1) * (closest_sqrt + 1) - x < x - closest_sqrt * closest_sqrt else closest_sqrt
+
 class Sol:
     def __init__(self, data):
         self.data = data
@@ -33,28 +86,7 @@ class Sol:
             if j >= 0 and series[j] is not None:
                 return series[j]
         assert False
-    def int_sqrt(self, x):
-        if x < 0:
-            raise ValueError("Input must be a non-negative integer.")
-        if x == 0 or x == 1:
-            return x
-        
-        left, right = 0, x
-        
-        while left <= right:
-            mid = (left + right) // 2
-            mid_squared = mid * mid
-            
-            if mid_squared == x:
-                return mid
-            elif mid_squared < x:
-                left = mid + 1
-                closest_sqrt = mid
-            else:
-                right = mid - 1
-
-        # After the loop, `closest_sqrt` is the integer closest to the square root
-        return closest_sqrt + 1 if (closest_sqrt + 1) * (closest_sqrt + 1) - x < x - closest_sqrt * closest_sqrt else closest_sqrt
+    
 
     def solve_one(self, series):
         assert len(series) == N
@@ -62,10 +94,10 @@ class Sol:
         last = self.closest_to_idx(series, N - 1)
         mid = self.closest_to_idx(series, N // 2)
         arit_avg = (first + last) / 2
-        geom_avg = self.int_sqrt(last * first)
+        geom_avg = int_sqrt(last * first)
         # range = last - first
         exp_flag = False
-        if abs(mid - geom_avg) < abs(mid - arit_avg):
+        if is_monotone(series) and abs(mid - geom_avg) < abs(mid - arit_avg):
             # assume exponential
             exp_flag = True
         for i, x in enumerate(series):
@@ -77,7 +109,7 @@ class Sol:
                 if up is None:
                     up = down
                 if exp_flag:
-                    series[i] = self.int_sqrt(up * down)
+                    series[i] = int_sqrt(up * down)
                 else:
                     series[i] = (up + down) / 2
         return series
