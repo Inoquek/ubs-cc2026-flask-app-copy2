@@ -7,3 +7,4 @@ import routes.trivia
 import routes.diaries
 import routes.blankety
 import routes.trading
+import routes.mst
