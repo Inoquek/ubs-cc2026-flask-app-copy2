@@ -133,4 +133,4 @@ def blankety():
     # logger.info(data['series'])
     answer = Sol(data['series']).solve()
     logger.info(f"answer shape: {len(answer)}x{len(answer[0])}")
-    return answer
+    return jsonify({'answer': answer})
