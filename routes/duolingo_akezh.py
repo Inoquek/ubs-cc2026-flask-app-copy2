@@ -299,6 +299,46 @@ PARSERS: Dict[str, Callable[[str], int]] = {
     LANG_AR: arabic_to_int,
 }
 
+def solve(data):
+    
+    part = data.get("part")
+    challenge_input = data.get("challengeInput", {})
+    if part not in ("ONE", "TWO"):
+        return jsonify({"error": "part must be 'ONE' or 'TWO'"}), 400
+    if not isinstance(challenge_input, dict):
+        return jsonify({"error": "challengeInput must be an object"}), 400
+    unsorted_list = challenge_input.get("unsortedList")
+    if not isinstance(unsorted_list, list) or not all(isinstance(x, str) for x in unsorted_list):
+        return jsonify({"error": "unsortedList must be a list of strings"}), 400
+
+    if part == "ONE":
+        values: List[int] = []
+        for s in unsorted_list:
+            s2 = s.strip()
+            if _DIGITS_ONLY.match(s2):
+                values.append(arabic_to_int(s2))
+            else:
+                values.append(roman_to_int(s2))
+        values.sort()
+        return {"sortedList": [str(v) for v in values]}
+
+    else:  # part == "TWO"
+        logger.info(f"Given input = {unsorted_list}")
+        
+        annotated: List[Tuple[int, int, int, str]] = []
+        for idx, s in enumerate(unsorted_list):
+            lang = detect_language(s)
+            val = PARSERS[lang](s.strip())
+            
+            tie_rank = TIE_ORDER[lang]
+            annotated.append((val, tie_rank, idx, s))
+
+        annotated.sort(key=lambda t: (t[0], t[1], t[2]))
+        logger.info(annotated)
+        sorted_list = [t[3] for t in annotated]
+        
+        return {"sortedList": sorted_list}
+
 # ---------------------------
 # Endpoint
 # ---------------------------
@@ -310,60 +350,7 @@ def duolingo1():
     Output JSON:
       { "sortedList": [<str>, ...] }
     """
-    try:
-        payload = request.get_json(force=True, silent=False)
-    except Exception:
-        return jsonify({"error": "Invalid JSON"}), 400
+    payload = request.get_json(force=True, silent=False)
+    logger.info(f'--PROCESSING {payload.challenge}--')
 
-    if not isinstance(payload, dict):
-        return jsonify({"error": "Invalid request root"}), 400
-
-    part = payload.get("part")
-    challenge_input = payload.get("challengeInput", {})
-    if part not in ("ONE", "TWO"):
-        return jsonify({"error": "part must be 'ONE' or 'TWO'"}), 400
-    if not isinstance(challenge_input, dict):
-        return jsonify({"error": "challengeInput must be an object"}), 400
-    unsorted_list = challenge_input.get("unsortedList")
-    if not isinstance(unsorted_list, list) or not all(isinstance(x, str) for x in unsorted_list):
-        return jsonify({"error": "unsortedList must be a list of strings"}), 400
-
-    try:
-        if part == "ONE":
-            values: List[int] = []
-            for s in unsorted_list:
-                s2 = s.strip()
-                if _DIGITS_ONLY.match(s2):
-                    values.append(arabic_to_int(s2))
-                else:
-                    values.append(roman_to_int(s2))
-            values.sort()
-            return jsonify({"sortedList": [str(v) for v in values]})
-
-        else:  # part == "TWO"
-            logger.info(f"Given input = {unsorted_list}")
-            
-            annotated: List[Tuple[int, int, int, str]] = []
-            for idx, s in enumerate(unsorted_list):
-                lang = detect_language(s)
-                val = PARSERS[lang](s.strip())
-                
-                tie_rank = TIE_ORDER[lang]
-                annotated.append((val, tie_rank, idx, s))
-
-            annotated.sort(key=lambda t: (t[0], t[1], t[2]))
-            sorted_list = [t[3] for t in annotated]
-            # log the final sorted list
-            _log_only_when_wrong(part, payload.get("challenge"), unsorted_list, annotated)
-
-            return jsonify({"sortedList": sorted_list})
-
-    except ValueError as ve:
-        return jsonify({"error": str(ve)}), 400
-    except Exception:
-        return jsonify({"error": "Internal error"}), 500
-
-# Local run
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "8080"))
-    app.run(host="0.0.0.0", port=port)
+    return jsonify(solve(payload))

@@ -9,3 +9,4 @@ import routes.blankety
 import routes.trading
 import routes.mst
 import routes.mouse
+import routes.duolingo

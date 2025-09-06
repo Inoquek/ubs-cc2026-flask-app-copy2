@@ -15,8 +15,8 @@ class Sol:
 def duolingo():
     # global TEST_CASE
     data = request.get_json(silent=True) or {}
+    logger.info(f"---PROCESSING QUERY, PART {data['part']}---")
     logger.info(str(data))
     # TEST_CASE += 1
-    logger.info(f"---PROCESSING QUERY with N={data}---")
 
     return jsonify([])
