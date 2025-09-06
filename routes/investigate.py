@@ -62,9 +62,8 @@ def investigate():
     data = request.get_json(silent=True) or {}
     networks = data.get("networks")
 
-    logger.info(networks)
     result = {"networks": [calc(n) for n in networks]}
     logger.info("investigate result: %s", result)
-    return json.dumps(result)
+    return jsonify(result)
 
 
