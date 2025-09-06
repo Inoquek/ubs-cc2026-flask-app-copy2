@@ -303,10 +303,13 @@ def testing(base64_string):
 
     h, w = pixels.shape[:-1]
 
-    result, connected_areas = analyze_digit_areas(pixels)
+    connected_areas = extract_connected_areas(pixels)
     connected_areas = sorted(connected_areas, key=lambda area: area['size'])
     for area in connected_areas:
         bbox = area['bbox']
+        if area['color'] == [204, 150, 41]:
+            logger.info("whats up with this area")
+            logger.info(area)
         area['bbox_size'] = (bbox[2] - bbox[0], bbox[3] - bbox[1], area['size'])
         area.pop('size')
         area.pop('bbox')
@@ -315,7 +318,6 @@ def testing(base64_string):
     regions = find_black_regions_and_neighbors(pixels)
     edges = extract_edges_from_regions(regions)
     
-
 
 bbox_size_to_digit = {
     (np.int64(11), np.int64(7), np.int64(56)): 0,
@@ -359,6 +361,11 @@ class Sol():
                         # logger.info(area['centroid_relative'], "case 2")
                         if area['centroid_relative'][1] > 0.5: # > min(..)
                             digit[1] = 9
+                    
+                if area['bbox_size'] == (np.int64(11), np.int64(7), np.int64(51)):
+                    # 3 has .. = 0.5, 2 has .. = 0.54
+                    if area['centroid_relative'][0] > 0.52:
+                        digit[1] = 2
                     
                 digits.append(tuple(digit))
         digits.sort()
