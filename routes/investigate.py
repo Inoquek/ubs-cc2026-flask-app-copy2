@@ -60,7 +60,9 @@ def calc(network: dict) -> dict:
 @app.route("/investigate", methods = ["POST"])
 def investigate():
     data = request.get_json(silent=True) or {}
-    networks = data.get("networks")
+    networks = data.get("networks", [])
+
+    logger.info("Received networks: %d", len(networks))
 
     result = {"networks": [calc(n) for n in networks]}
     logger.info("investigate result: %s", result)
