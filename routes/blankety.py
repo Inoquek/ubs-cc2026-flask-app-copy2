@@ -7,6 +7,7 @@ import math
 logger = logging.getLogger(__name__)
 
 N = 1000
+N = 1000
 class Sol:
     def __init__(self, data):
         self.data = data
@@ -32,6 +33,29 @@ class Sol:
             if j >= 0 and series[j] is not None:
                 return series[j]
         assert False
+    def int_sqrt(self, x):
+        if x < 0:
+            raise ValueError("Input must be a non-negative integer.")
+        if x == 0 or x == 1:
+            return x
+        
+        left, right = 0, x
+        
+        while left <= right:
+            mid = (left + right) // 2
+            mid_squared = mid * mid
+            
+            if mid_squared == x:
+                return mid
+            elif mid_squared < x:
+                left = mid + 1
+                closest_sqrt = mid
+            else:
+                right = mid - 1
+
+        # After the loop, `closest_sqrt` is the integer closest to the square root
+        return closest_sqrt + 1 if (closest_sqrt + 1) * (closest_sqrt + 1) - x < x - closest_sqrt * closest_sqrt else closest_sqrt
+
     def solve_one(self, series):
         assert len(series) == N
         first = self.closest_to_idx(series, 0)
@@ -39,7 +63,7 @@ class Sol:
         mid = self.closest_to_idx(series, N // 2)
         arit_avg = (first + last) / 2
         print(first * last)
-        geom_avg = math.sqrt(first * last)
+        geom_avg = self.int_sqrt(last * first)
         # range = last - first
         exp_flag = False
         if abs(mid - geom_avg) < abs(mid - arit_avg):
@@ -54,7 +78,7 @@ class Sol:
                 if up is None:
                     up = down
                 if exp_flag:
-                    series[i] = math.sqrt(up * down)
+                    series[i] = self.int_sqrt(up * down)
                 else:
                     series[i] = (up + down) / 2
         return series
