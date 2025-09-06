@@ -6,18 +6,18 @@ from flask import jsonify, request
 import math
 logger = logging.getLogger(__name__)
 
-class Sol:
-    def __init__(self, news):
-        self.news = news
+# class Sol:
+#     def __init__(self, news):
+#         self.news = news
 
-TEST_CASE = 0
+# TEST_CASE = 0
 @app.route("/trading-bot", methods = ["POST"])
 def trading():
-    global TEST_CASE
+    # global TEST_CASE
     data = request.get_json(silent=True) or {}
-    TEST_CASE += 1
-    logger.info(f"PROCESSING #{TEST_CASE}")
+    # TEST_CASE += 1
+    logger.info(f"---PROCESSING TEST---")
 
-    logger.warning(data)
+    logger.info(data)
 
     return jsonify([])
