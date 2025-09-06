@@ -37,10 +37,10 @@ def is_monotone(data):
     return increasing_ratio >= 0.9 or decreasing_ratio >= 0.9
 
 def int_sqrt(x):
-    if abs(x) < 1e9:
-        return math.sqrt(x)
     if x < 0:
-        raise ValueError("Input must be a non-negative integer.")
+        return 0
+    if x < 1e9:
+        return math.sqrt(x)
     if x == 0 or x == 1:
         return x
     
@@ -133,5 +133,5 @@ def blankety():
     # logger.info(data['series'])
     answer = Sol(data['series']).solve()
     logger.info(f"answer shape: {len(answer)}x{len(answer[0])}")
-    
+
     return jsonify({'answer': answer})
