@@ -112,6 +112,11 @@ class Sol:
                     series[i] = int_sqrt(up * down)
                 else:
                     series[i] = (up + down) / 2
+        
+        if len(series) != N:
+            logger.error(f"len is {len(series)}")
+        if None in series:
+            logger.error(f"still Nones: {series.count(None)}")
         return series
 
         
