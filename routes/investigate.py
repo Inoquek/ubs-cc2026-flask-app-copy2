@@ -85,8 +85,6 @@ def investigate():
     """
     data = request.get_json(silent=True) or {}
     networks = data.get("networks")
-    if not isinstance(networks, list):
-        return jsonify(error="Body must contain 'networks' as a list"), 400
 
     result = {"networks": [calc(n) for n in networks]}
     logger.info("investigate result: %s", result)
@@ -105,3 +103,4 @@ def investigate():
     
 #     logging.info("My result :{}".format(result))
 #     return json.dumps(result)
+
