@@ -28,62 +28,76 @@ class Sol:
     def solve(self):
         self.process_graph()
         
-        for task in self.tasks:
-            task['station'] = self.vertices.index(task['station'])
-        self.s0 = self.vertices.index(self.s0)
-
-        self.name_to_task = {}
+        # TASK PROCESSING
+        self.T = len(self.tasks)
+        self.tasks.sort(key = lambda task: task['end'])
+        self.task_names = [task['name'] for task in self.tasks]
         self.times = [0]
         for task in self.tasks:
-            self.name_to_task[task['name']] = task
             self.times.append(task['start'])
             self.times.append(task['end'])
         self.times = list(set(self.times))
         self.times.sort()
-        # only storing ending times of tasks
-        self.dp = {(0, self.s0): (0, 0, None)} # (score, -fee, name)
-        answer = (0, 0, None)
-        self.par = {}
-        for task in sorted(self.tasks, key = lambda task: task['end']):
+
+        for task in self.tasks: # 0-indexed
+            task['station'] = self.vertices.index(task['station'])
+            task['start'] = self.times.index(task['start'])
+            task['end'] = self.times.index(task['end'])
+        self.s0 = self.vertices.index(self.s0)
+
+        # dp[task]
+        self.dp = [(-self.INF, 0, None) for _ in range(self.T + 1)] # (score, -fee, par name)
+        # 1-indexed
+        self.dp[0] = (0, 0, None)
+        answer = (0, 0, 0)
+        for i, task in enumerate(self.tasks):
             v_sit = task['station']
-            t1, t2 = self.times.index(task['start']), self.times.index(task['end'])
-            self.dp[(t2, v_sit)] = (-self.INF, 0, [])
-            for (t0, u), (score, fee, name) in self.dp.items():
+            t1 = task['start']
+            # print("\nprocessing", i, task['name'], task['start'], task['end'])
+            for j, (score, fee, _) in enumerate(self.dp[:i + 1]):
+                if j > 0:
+                    t0 = self.tasks[j - 1]['end']
+                    u = self.tasks[j - 1]['station']
+                else:
+                    t0, u = 0, self.s0
                 if t0 > t1:
                     continue
+                # print('     considering', t0, u, self.tasks[j - 1]['name'] if j > 0 else 'START')
                 # if we take t0:
                 score += task['score']
                 fee -= self.d[u][v_sit]
-                if (score, fee) > self.dp[(t2, v_sit)][:-1]:
-                    self.dp[(t2, v_sit)] = (score, fee, task['name'])
-                    self.par[task['name']] = name
+                if (score, fee) > self.dp[i + 1][:-1]:
+                    # print('update dp: ', score, fee, j)
+                    self.dp[i + 1] = (score, fee, j)
+                    
 
-            score, fee, schedule = self.dp[(t2, v_sit)]
+            score, fee, _ = self.dp[i + 1]
             fee -= self.d[v_sit][self.s0]
+            # print("eval:", i + 1, task['name'], score, fee)
             if (score, fee) > answer[:-1]:
-                answer = (score, fee, task['name'])
-        
+                answer = (score, fee, i + 1)
+    
         logger.info(answer)
         last_task = answer[2]
         schedule = []
         fee_brute_force = 0
         score_brute_force = 0
         last_v = self.s0
-        while last_task is not None:
-            task_obj = self.name_to_task[last_task]
+        while last_task > 0:
+            task_obj = self.tasks[last_task - 1]
             v = task_obj['station']
             score_brute_force += task_obj['score']
 
             fee_brute_force += self.d[last_v][v]
             last_v = v
-            schedule.append(last_task)
-            last_task = self.par[last_task]
+            schedule.append(task_obj['name'])
+            last_task = self.dp[last_task][2]
         
         fee_brute_force += self.d[last_v][self.s0]
         if not (fee_brute_force == -answer[1]):
             logger.error(f"fee incorrect: {fee_brute_force}, not {-answer[1]}")
         if not (score_brute_force == answer[0]):
-            logger.error(f"fee incorrect: {score_brute_force}, not {answer[0]}")
+            logger.error(f"score incorrect: {score_brute_force}, not {answer[0]}")
 
 
         schedule = schedule[::-1]
@@ -92,7 +106,7 @@ class Sol:
             "min_fee": -answer[1],
             "schedule": schedule
         }
-        logger.info(f"N = {self.n}, T = {len(self.tasks)}")
+        logger.info(f"N = {self.n}, T = {self.T}")
         return answer
 
 
@@ -119,8 +133,10 @@ def princess_diaries():
     starting_station = data.get("starting_station")
 
     # Example: log what we received
-    logger.info("Received %d tasks", len(tasks))
-    logger.info("Received %d subway connections", len(subway))
+    logger.debug("Received tasks:")
+    logger.debug(tasks)
+    logger.info("Received subway connections:")
+    logger.info(subway)
     logger.info("Starting station: %s", starting_station)
     
     solution = Sol(tasks, subway, starting_station).solve()
