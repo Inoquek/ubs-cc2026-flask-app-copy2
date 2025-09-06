@@ -1,5 +1,6 @@
 # routes/investigate.py
 import logging
+import json
 from collections import defaultdict
 from flask import request, jsonify
 from routes import app
@@ -56,37 +57,51 @@ def calc(network: dict) -> dict:
     return out
 
 
-@app.post("/investigate")
-def investigate():
-    """
-    POST /investigate
-    Body:
-    {
-      "networks": [
-        {
-          "networkId": "N1",
-          "network": [{"spy1":"A","spy2":"B"}, {"spy1":"B","spy2":"C"}]
-        },
-        ...
-      ]
-    }
+# @app.post("/investigate")
+# def investigate():
+#     """
+#     POST /investigate
+#     Body:
+#     {
+#       "networks": [
+#         {
+#           "networkId": "N1",
+#           "network": [{"spy1":"A","spy2":"B"}, {"spy1":"B","spy2":"C"}]
+#         },
+#         ...
+#       ]
+#     }
 
-    Response:
-    {
-      "networks": [
-        {
-          "networkId": "N1",
-          "network": [{"spy1":"A","spy2":"B"}, ...]  # edges that are still connected if removed
-        },
-        ...
-      ]
-    }
-    """
-    data = request.get_json(silent=True) or {}
+#     Response:
+#     {
+#       "networks": [
+#         {
+#           "networkId": "N1",
+#           "network": [{"spy1":"A","spy2":"B"}, ...]  # edges that are still connected if removed
+#         },
+#         ...
+#       ]
+#     }
+#     """
+#     data = request.get_json(silent=True) or {}
+#     networks = data.get("networks")
+#     if not isinstance(networks, list):
+#         return jsonify(error="Body must contain 'networks' as a list"), 400
+
+#     result = {"networks": [calc(n) for n in networks]}
+#     logger.info("investigate result: %s", result)
+#     return jsonify(result)
+
+
+@app.route('/investigate', methods=['POST'])
+def evaluate():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
     networks = data.get("networks")
-    if not isinstance(networks, list):
-        return jsonify(error="Body must contain 'networks' as a list"), 400
 
-    result = {"networks": [calc(n) for n in networks]}
-    logger.info("investigate result: %s", result)
-    return jsonify(result)
+    result = {"networks": []}
+    for network in networks:
+        result["networks"].append(calc(network))
+    
+    logging.info("My result :{}".format(result))
+    return json.dumps(result)
