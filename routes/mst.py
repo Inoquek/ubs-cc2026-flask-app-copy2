@@ -316,6 +316,7 @@ def testing(base64_string):
     edges = extract_edges_from_regions(regions)
     
 
+
 bbox_size_to_digit = {
     (np.int64(11), np.int64(7), np.int64(56)): 0,
     (np.int64(11), np.int64(8), np.int64(56)): 0,
@@ -348,8 +349,16 @@ class Sol():
                 continue
             if area['bbox_size'] in bbox_size_to_digit:
                 digit = [area['centroid'][1], bbox_size_to_digit[area['bbox_size']]]
-                if digit[1] == 6 and min(area['centroid_relative']) > 0.5:
-                    digit[1] = 9
+                if digit[1] == 6:
+                    if int(min(area['centroid_relative']) > 0.5) + int(max(area['centroid_relative']) > 0.5) != 1:
+                        # case 1 (both larger or both smaller)
+                        # logger.info(area['centroid_relative'], "case 1")
+                        if min(area['centroid_relative']) > 0.5:
+                            digit[1] = 9
+                    else:
+                        # logger.info(area['centroid_relative'], "case 2")
+                        if area['centroid_relative'][1] > 0.5: # > min(..)
+                            digit[1] = 9
                     
                 digits.append(tuple(digit))
         digits.sort()
