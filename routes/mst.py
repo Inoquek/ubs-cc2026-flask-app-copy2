@@ -392,6 +392,7 @@ def mst():
     data = request.get_json(silent=True) or {}
     # TEST_CASE += 1
     logger.info(f"---PROCESSING TEST---")
+    logger.info(data)
 
     answer = [Sol(test_case['image']).solve() for test_case in data]
 
