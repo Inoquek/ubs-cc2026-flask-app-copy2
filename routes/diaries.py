@@ -122,11 +122,13 @@ class Sol:
                 for j in range(self.n):
                     self.d[i][j] = min(self.d[i][j], self.d[i][k] + self.d[k][j])
 
+TEST_CASE = 0
 
 @app.route("/princess-diaries", methods = ["POST"])
 def princess_diaries():
     data = request.get_json(silent=True) or {}
-    logger.warning("FULL DATA")
+    TEST_CASE += 1
+    logger.warning(f"FULL DATA #{TEST_CASE}")
     logger.warning(data)
 
     # extract top-level keys
