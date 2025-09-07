@@ -13,7 +13,7 @@ def chasetheflag():
     response = {
   "challenge1": "UBS{6e5aa87f066512891b827e349d1e26cd}",
   "challenge2": "your_flag_2",
-  "challenge3": "your_flag_3",
+  "challenge3": "17d637c84345",
   "challenge4": "your_flag_4",
   "challenge5": "your_flag_5"
 }
